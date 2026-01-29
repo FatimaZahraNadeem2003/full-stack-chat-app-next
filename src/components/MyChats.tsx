@@ -39,9 +39,7 @@ interface Chat {
 
 const MyChats: React.FC<MyChatsProps> = ({ fetchAgain }) => {
 
-  const [loggedUser, setLoggedUser] = useState<User | null>(null);
   const [showChats, setShowChats] = useState(true);
-
   const { user, selectedChat, setSelectedChat, chats, setChats } = ChatState();
   const toast = useToast();
 
@@ -63,9 +61,8 @@ const MyChats: React.FC<MyChatsProps> = ({ fetchAgain }) => {
   }
 
   useEffect(() => {
-    setLoggedUser(JSON.parse(localStorage.getItem("userInfo") || 'null'));
     fetchChats();
-  }, [fetchAgain]);
+  }, [fetchAgain, user]);
 
   return (
     <Box
@@ -162,11 +159,11 @@ const MyChats: React.FC<MyChatsProps> = ({ fetchAgain }) => {
                       size='sm'
                       name={
                         !chat.isGroupChat
-                          ? getSender(loggedUser, chat.users)
+                          ? getSender(user, chat.users)
                           : chat.chatName
                       }
                       src={!chat.isGroupChat
-                        ? chat.users.find(u => u._id !== loggedUser?._id)?.pic
+                        ? chat.users.find(u => u._id !== user?._id)?.pic
                         : undefined
                       }
                       borderWidth={isSelected ? "2px" : "1px"}
@@ -175,7 +172,7 @@ const MyChats: React.FC<MyChatsProps> = ({ fetchAgain }) => {
                     <Box>
                       <Text fontWeight='600'>
                         {!chat.isGroupChat
-                          ? getSender(loggedUser, chat.users)
+                          ? getSender(user, chat.users)
                           : chat.chatName}
                       </Text>
                       <Text fontSize='xs' opacity={0.8}>

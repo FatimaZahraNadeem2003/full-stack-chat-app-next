@@ -37,6 +37,20 @@ const ChatProvider: React.FC<ChatProviderProps> = ({children}) => {
       
     },[history]);
 
+    // Listen for storage events to update user state when localStorage changes from other tabs/windows
+    useEffect(() => {
+      const handleStorageChange = () => {
+        const userInfo = JSON.parse(localStorage.getItem("userInfo") || 'null');
+        setUser(userInfo);
+      };
+
+      window.addEventListener('storage', handleStorageChange);
+      
+      return () => {
+        window.removeEventListener('storage', handleStorageChange);
+      };
+    }, []);
+
     return (
        <ChatContext.Provider value={{user, setUser, selectedChat, setSelectedChat, chats, setChats, notification, setNotification}}>
         {children}

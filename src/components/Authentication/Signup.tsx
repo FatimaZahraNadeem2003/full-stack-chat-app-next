@@ -3,6 +3,7 @@ import React, { useState } from 'react'
 import { useToast } from '@chakra-ui/react'
 import axios from 'axios'
 import { useHistory } from 'react-router-dom'
+import { ChatState } from '../../Context/ChatProvider'
 
 interface CloudinaryResponse {
   url: string;
@@ -11,6 +12,7 @@ interface CloudinaryResponse {
 const Signup: React.FC = () => {
   const toast = useToast()
   const history = useHistory();
+  const { setUser } = ChatState();
 
   const [show, setShow] = useState(false)
   const [name, setName] = useState<string>('');
@@ -106,6 +108,7 @@ const Signup: React.FC = () => {
         position: 'bottom'
       })
 
+      setUser(data);
       localStorage.setItem('userInfo', JSON.stringify(data));
       setLoading(false);
       history.push('/chats')
