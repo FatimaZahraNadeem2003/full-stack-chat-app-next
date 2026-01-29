@@ -88,8 +88,8 @@ const SingleChat: React.FC<SingleChatProps> = ({ fetchAgain, setFetchAgain }) =>
   }, [selectedChat]);
 
   useEffect(() => {
-    socket.on('message recieved', (newMessageRecieved: Message) => {
-      console.log('New message received:', newMessageRecieved); 
+    const handleMessageReceived = (newMessageRecieved: Message) => {
+      console.log('New message received:', newMessageRecieved);
       if (!selectedChatCompare || selectedChatCompare._id !== newMessageRecieved.chat._id) {
         const enhancedNotification = {
           ...newMessageRecieved,
@@ -100,20 +100,22 @@ const SingleChat: React.FC<SingleChatProps> = ({ fetchAgain, setFetchAgain }) =>
         console.log('Adding notification:', enhancedNotification);
         setNotification(prev => {
           const newNotifications = [enhancedNotification, ...prev];
-          console.log('Updated notifications:', newNotifications); 
+          console.log('Updated notifications:', newNotifications);
           return newNotifications;
         });
-        setFetchAgain(!fetchAgain);
+        setFetchAgain(prev => !prev);
       } else {
         setMessages(prev => [...prev, newMessageRecieved]);
         markMessagesAsRead(newMessageRecieved.chat._id);
       }
-    });
+    };
+
+    socket.on('message recieved', handleMessageReceived);
     
     return () => {
-      socket.off('message recieved');
+      socket.off('message recieved', handleMessageReceived);
     };
-  }, [socket, selectedChatCompare, fetchAgain, setNotification, setFetchAgain]);
+  }, [socket, selectedChatCompare, setNotification, setFetchAgain, setMessages, markMessagesAsRead]);
 
   const markMessagesAsRead = async (chatId: string) => {
     try {
