@@ -1,62 +1,83 @@
 import React from 'react'
 import ScrollableFeed from 'react-scrollable-feed'
-import { isLastMessage, isSameSender, isSameSenderMargin, isSameUser, User, Message } from '../config/ChatLogics'
+import { isLastMessage, isSameSender, isSameSenderMargin, isSameUser, Message } from '../config/ChatLogics'
 import { ChatState } from './../Context/ChatProvider';
-import { Avatar, Tooltip, Box } from '@chakra-ui/react';
+import { Avatar, Tooltip, Box, Text, Flex, VStack } from '@chakra-ui/react';
 
 interface ScrollableChatProps {
   messages: Message[];
 }
 
 const ScrollableChat: React.FC<ScrollableChatProps> = ({ messages }) => {
-
   const { user } = ChatState();
 
   return (
     <ScrollableFeed>
-      {messages && messages.map((m, i) => (
-        <Box
-          key={m._id}
-          display='flex'
-          w='100%'
-          justifyContent={m.sender._id === user._id ? 'flex-end' : 'flex-start'}
-          mb={2}
-        >
-          {(isSameSender(messages, m, i, user._id) || isLastMessage(messages, i, user._id)) && (
-            <Tooltip label={m.sender.name} placement='bottom-start' hasArrow>
-              <Avatar
-                mt='7px'
-                mr={2}
-                size='sm'
-                cursor='pointer'
-                name={m.sender.name}
-                src={m.sender.pic}
-              />
-            </Tooltip>
-          )}
+      {messages && messages.map((m, i) => {
+        const isMe = m.sender._id === user._id;
+        const isFirstInGroup = i === 0 || messages[i - 1].sender._id !== m.sender._id;
 
-          <Box
-            bg={m.sender._id === user._id ? 'teal.400' : 'gray.200'}
-            color={m.sender._id === user._id ? 'white' : 'gray.800'}
-            borderRadius='20px'
-            p='8px 16px'
-            maxW={{ base: '65%', md: '75%' }}
-            ml={isSameSenderMargin(messages, m, i, user._id)}
-            mt={isSameUser(messages, m, i) ? 1 : 3}
-            boxShadow='md'
-            wordBreak='break-word'
-            transition='0.2s'
-            _hover={{
-              boxShadow: 'lg',
-              transform: 'scale(1.02)'
-            }}
+        return (
+          <Flex
+            key={m._id}
+            w="100%"
+            justifyContent={isMe ? 'flex-end' : 'flex-start'}
+            px={4}
+            mb={isSameUser(messages, m, i) ? 1 : 3}
           >
-            {m.content}
-          </Box>
-        </Box>
-      ))}
+            {!isMe && (
+              <Box w="32px" mr={2}>
+                {isFirstInGroup ? (
+                  <Tooltip label={m.sender.name} placement='bottom-start' hasArrow>
+                    <Avatar
+                      size='xs'
+                      cursor='pointer'
+                      name={m.sender.name}
+                      src={m.sender.pic}
+                    />
+                  </Tooltip>
+                ) : null}
+              </Box>
+            )}
+
+            <VStack align={isMe ? 'flex-end' : 'flex-start'} spacing={0} maxW="75%">
+              
+              {!isMe && isFirstInGroup && (
+                <Text 
+                  fontSize='xs' 
+                  fontWeight='bold' 
+                  color='teal.600' 
+                  ml={1} 
+                  mb={1}
+                >
+                  {m.sender.name}
+                </Text>
+              )}
+
+              <Box
+                bg={isMe ? '#dcf8c6' : 'white'} 
+                color='gray.800'
+                borderRadius={isMe 
+                    ? '10px 0px 10px 10px' 
+                    : '0px 10px 10px 10px' 
+                }
+                p='6px 12px'
+                boxShadow='sm'
+                wordBreak='break-word'
+                position="relative"
+              >
+                <Text fontSize="md">{m.content}</Text>
+                
+                <Text fontSize="9px" textAlign="right" color="gray.500" mt={1}>
+                  12:00 PM
+                </Text>
+              </Box>
+            </VStack>
+          </Flex>
+        );
+      })}
     </ScrollableFeed>
   )
 }
 
-export default ScrollableChat
+export default ScrollableChat;
