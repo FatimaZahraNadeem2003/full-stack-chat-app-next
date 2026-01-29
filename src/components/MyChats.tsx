@@ -75,6 +75,20 @@ const MyChats: React.FC<MyChatsProps> = ({ fetchAgain }) => {
     fetchChats();
   }, [fetchAgain, user]);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && selectedChat) {
+        setSelectedChat('');
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedChat, setSelectedChat]);
+
   const getUnreadCount = (chat: Chat): number => {
     if (chat.latestMessage && !chat.latestMessage.isRead && chat.latestMessage.sender._id !== user?._id) {
       return chat.unreadCount || 1;
@@ -94,10 +108,9 @@ const MyChats: React.FC<MyChatsProps> = ({ fetchAgain }) => {
       borderWidth='1px'
       borderColor="gray.200"
       boxShadow='xl'
-      h="100%" // Parent container ki poori height lega (100vh nahi)
-      overflow="hidden" // Outer box scroll nahi hona chahiye
+      h="100%" 
+      overflow="hidden" 
     >
-      {/* Header */}
       <Flex align='center' justify='space-between' px={2} pb={3} flexShrink={0}>
         <Flex align="center" gap={2}>
           <IconButton
@@ -132,15 +145,14 @@ const MyChats: React.FC<MyChatsProps> = ({ fetchAgain }) => {
 
       <Divider mb={2} />
 
-      {/* Chat List Container */}
       <Collapse in={showChats} animateOpacity style={{ flex: 1, overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
         <Box
-          flex='1' // Ye bachi hui sari space le lega
+          flex='1' 
           bg="rgba(255,255,255,0.15)"
           backdropFilter="blur(8px)"
           borderRadius='2xl'
           p={2}
-          overflowY='auto' // Sirf yahan scroll aayega
+          overflowY='auto' 
           overflowX='hidden'
           css={{
             "&::-webkit-scrollbar": { width: "6px" },
@@ -149,7 +161,7 @@ const MyChats: React.FC<MyChatsProps> = ({ fetchAgain }) => {
           }}
         >
           {chats ? (
-            <Stack spacing={3} pb={2}> {/* Thora sa bottom padding taake last chat clear dikhayi de */}
+            <Stack spacing={3} pb={2}> 
               {chats.map((chat: Chat) => {
                 const isSelected = selectedChat?._id === chat._id;
                 const unreadCount = getUnreadCount(chat);

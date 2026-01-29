@@ -163,6 +163,20 @@ const SingleChat: React.FC<SingleChatProps> = ({ fetchAgain, setFetchAgain }) =>
 
   const clearReply = () => setReplyingTo(null);
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && selectedChat) {
+        setSelectedChat('');
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedChat, setSelectedChat]);
+
   return (
     <>
       {selectedChat ? (
